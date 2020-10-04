@@ -1,0 +1,56 @@
+#!/bin/bash
+echo hello;echo hello
+
+
+word=333
+
+case "$word" in
+	abc) echo "$word=abc";;
+	333) echo "$word=333";;
+esac
+
+
+t2=0
+let "t2 = ((a=9, 15/3)) " 
+echo $t2
+
+
+#while :
+#do
+#	echo "true"
+#done
+
+# : 是shell的内建命令 返回true
+
+if ((t2==5))
+then :
+else
+	echo "t2 equals 5"
+fi
+
+n=0
+
+: $((n++))  
+# ：作为占为符号
+# ：将n++ 解释为运算表达式 如果没有： bash将将解释为命令
+# ((n++)) 可以达到相同效果
+echo -n "$n"
+
+: > hello.txt
+#将hello.txt 截断为0，如果不存在文件 则创建文件
+echo "进程id $$"
+a=333
+## 命令组 被当作子shell执行 子shell的变量不影响父shell 变量
+(a=hello ; echo $a)
+echo $a
+date
+
+ttt=(1,2,3)
+echo "$ttt 0"
+
+
+echo '$SHELL' #单引号防止一切扩展，包括通配符、变量
+echo "$SHELL" #双引号允许变量扩展，不允许通配符扩展
+# $* 表示传入的所有参数
+# $1第一个参数
+# $# 参数的个数
