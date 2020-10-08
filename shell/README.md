@@ -41,3 +41,8 @@ echo ${username:?'error:set  varaible   username to null'}
 ### 测试变量是否被set
 : ${username?} # :后面需要加空格，该命令不会被输出，除非变量没有被设置
 
+### 根据变量查看被声明的变量
+echo ${!varprefix*}
+
+
+
