@@ -45,4 +45,85 @@ echo ${username:?'error:set  varaible   username to null'}
 echo ${!varprefix*}
 
 
+### 随机数
+$RANDOM
+RANGE=20
+范围随机数
+let "number=$RANDOM%$RANGE"
+echo $number
 
+### 输出数组长度
+array=(1,2,3)
+
+echo ${#array[*])
+echo ${#array[@]}
+
+
+#### for循环
+list="file1.txt
+file2.txt
+file3.txt"
+
+for file in $list
+do
+	echo $file
+done
+
+##### 没有参数的for循环会自动使用位置参数
+for i
+do
+	echo $i # $0 $1........
+done
+
+##### for 循环在二进制文件中查找字符串
+
+
+for word in $( strings "$2" | grep "$1" )
+do 
+echo $word
+done
+
+#### c语言风格的for 循环
+for ((i=0;i<10;i++) 没有$符号
+do
+echo $i
+
+done
+
+
+for ((i=0,j=0;i<10;i++,j++) 没有$符号,同时对两个变量加一
+
+do
+echo $i
+
+done
+
+
+### while 的多条件循环，只有最后一个条件可以控制循环
+while echo "previous-variable = $previous"
+
+ echo
+
+ previous=$var1
+
+ [ "$var1" != end ] 
+
+
+do 
+
+	echo "while condition  running"
+done
+#### 实例
+a=1
+b=3
+
+while [ $a -lt 10 ]
+	[ $b -lt 10 ]
+	[ $a -lt $b ]
+do
+	let "a++"
+	echo "running: \$a=$a ; \$b=$b"
+done
+
+
+echo "--------------------"
