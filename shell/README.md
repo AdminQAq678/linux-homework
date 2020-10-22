@@ -226,3 +226,31 @@ cecho "feeling red" $red
 cecho "feeling black" $black
 cecho "feeling green" $green
 ```
+
+
+### read
+
+```bash
+read -s -n1 -p "Hit a key " keypress
+# 将字符读取到keypress变量中
+# -n 表示接受n个字符的输入
+# -p 表示在读取输入前打印后面的提示符 "Hit a key"
+#-s不显示输入
+#  
+
+```
+
+
+### 目录栈
+1. pushd dirname 压入dirname到目录栈同时进入该目录
+2. popd 弹出目录栈并进入目录栈顶端的目录
+3. dirs 显示目录栈所有目录
+
+
+### $() 、 $(()) 、$[[]] 、${}、 ``
+1. $()和``用于命令的替换，其中$()只能用于bash中，``可用于其他类型的shell中
+2. $(()) 用于数值计算 
+3. [[]] 用于逻辑条件的判断 ,对 [] 的加强 ，是一个关键字
+4. ${} 变量的替换
+4. $() 和$(())中的$是用于提取返回值 $()为命令的执行结果,$(())为数值计算的结果
+
