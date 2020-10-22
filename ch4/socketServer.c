@@ -9,7 +9,7 @@
 #include <sys/select.h>
 
 
-#define SERVER_PORT 3300
+#define SERVER_PORT 80
 
 int main (int argc, char *argv[]){
 	printf("ok");
