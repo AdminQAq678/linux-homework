@@ -7,7 +7,7 @@
 #include<unistd.h>  
 #define BACKLOG 5     //完成三次握手但没有accept的队列的长度  
 #define CONCURRENT_MAX 8   //应用层同时可以处理的连接  
-#define SERVER_PORT 11332  
+#define SERVER_PORT 3030  
 #define BUFFER_SIZE 1024  
 #define QUIT_CMD ".quit"  
 int client_fds[CONCURRENT_MAX];  
