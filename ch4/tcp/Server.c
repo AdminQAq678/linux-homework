@@ -10,16 +10,36 @@
 #define SERVER_PORT 3030  
 #define BUFFER_SIZE 1024  
 #define QUIT_CMD ".quit"  
-int client_fds[CONCURRENT_MAX];  
+#define MSG_TO
+int client_fds[CONCURRENT_MAX];
+//服务器发送信息到客户端
+void sendTo(int fd, char *msg){
+
+
+}
+//截取字符串函数
+char *  subString(char *seq, int begin, int end){
+	char * tem=(char *) malloc(sizeof(char)*(end-begin+1));
+	int j=0;
+	for(int i=0;i<strlen(seq);i++){
+		if(i>=begin&&i<end){
+			tem[j++]=seq[i];
+		}	
+	}
+	return tem;
+
+}
 int main(int argc, const char * argv[])  
 {  
+    char *test="hello,world\n";	
+    printf("%s\n",subString(test,0,6));
     char input_msg[BUFFER_SIZE];  
     char recv_msg[BUFFER_SIZE];  
     //本地地址  
     struct sockaddr_in server_addr;  
     server_addr.sin_family = AF_INET;  
     server_addr.sin_port = htons(SERVER_PORT);  
-    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");  
+    server_addr.sin_addr.s_addr = INADDR_ANY;  
     bzero(&(server_addr.sin_zero), 8);  
     //创建socket  
     int server_sock_fd = socket(AF_INET, SOCK_STREAM, 0);  
@@ -92,6 +112,7 @@ int main(int argc, const char * argv[])
             //ret 为未状态发生变化的文件描述符的个数  
             if(FD_ISSET(STDIN_FILENO, &server_fd_set))  
             {  
+		
                 printf("发送消息：\n");  
                 bzero(input_msg, BUFFER_SIZE);  
                 fgets(input_msg, BUFFER_SIZE, stdin);  
@@ -99,9 +120,20 @@ int main(int argc, const char * argv[])
                 if(strcmp(input_msg, QUIT_CMD) == 0)  
                 {  
                     exit(0);  
-                }  
+                }else{
+			printf("判断客户端要发送的数据");
+				
+                	printf("%s\n",subString(input_msg,0,7));
+                	if(strcmp(subString(input_msg,0,7),"MSG_TO:")==0){
+				
+				printf("发送信息到......%s客户端\n",subString(input_msg,7,8));
+			}	
+		}	
+		
                 for(int i = 0; i < CONCURRENT_MAX; i++)  
                 {  
+
+		    //广播信息
                     if(client_fds[i] != 0)  
                     {  
                         printf("client_fds[%d]=%d\n", i, client_fds[i]);  
@@ -157,6 +189,7 @@ int main(int argc, const char * argv[])
                                 byte_num = BUFFER_SIZE;  
                             }  
                             recv_msg[byte_num] = '\0';  
+			    
                             printf("客户端(%d):%s\n", i, recv_msg);  
                         }  
                         else if(byte_num < 0)  
