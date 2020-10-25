@@ -28,7 +28,11 @@ int main(int argc, const char * argv[])
     {  
     fd_set client_fd_set;  
     struct timeval tv;  
-  
+     
+            if(send(server_sock_fd, "DEVICE+123", BUFFER_SIZE, 0) == -1)  
+            {  
+                perror("发送客户端名称消息出错!\n");  
+            }  
     while(1)  
     {  
         tv.tv_sec = 20;  

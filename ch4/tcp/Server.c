@@ -5,16 +5,39 @@
 #include<arpa/inet.h>  
 #include<string.h>  
 #include<unistd.h>  
+
 #define BACKLOG 5     //完成三次握手但没有accept的队列的长度  
 #define CONCURRENT_MAX 8   //应用层同时可以处理的连接  
 #define SERVER_PORT 3030  
 #define BUFFER_SIZE 1024  
 #define QUIT_CMD ".quit"  
 #define MSG_TO
+
+char **devarray;//传感器设备名称数组
+struct devnode{	//设备名称和connfd映射结构体，用于根据设备名称发送消息
+	char *name;
+	int connfd;	
+}devnode;
+
+
+
+//添加传感器客户端的唯一标识
 int client_fds[CONCURRENT_MAX];
+
+struct devnode devNodes[CONCURRENT_MAX];
 //服务器发送信息到客户端
 void sendTo(int fd, char *msg){
 
+
+}
+
+void devNodesInit (){
+//初始化结构体
+for(int i=0;i<CONCURRENT_MAX;i++){
+	devNodes[i].name="";
+	devNodes[i].connfd=0;
+
+}
 
 }
 //截取字符串函数
@@ -30,10 +53,10 @@ char *  subString(char *seq, int begin, int end){
 
 }
 int main(int argc, const char * argv[])  
-{  
-    char *test="hello,world\n";	
-    printf("%s\n",subString(test,0,6));
-    char input_msg[BUFFER_SIZE];  
+{ 
+	devNodesInit();//初始化devNodes结构体
+    
+	char input_msg[BUFFER_SIZE];  
     char recv_msg[BUFFER_SIZE];  
     //本地地址  
     struct sockaddr_in server_addr;  
@@ -86,7 +109,7 @@ int main(int argc, const char * argv[])
     //客户端连接  
         for(int i =0; i < CONCURRENT_MAX; i++)  
         {  
-            //printf("client_fds[%d]=%d\n", i, client_fds[i]);  
+           printf("client_fds[%d]=%d\n", i, client_fds[i]);  
             if(client_fds[i] != 0)  
             {  
                 FD_SET(client_fds[i], &server_fd_set);  
@@ -136,6 +159,7 @@ int main(int argc, const char * argv[])
 		    //广播信息
                     if(client_fds[i] != 0)  
                     {  
+			printf("devnodes__fds%d------Name:%s----",devNodes[i].connfd,devNodes[i].name);
                         printf("client_fds[%d]=%d\n", i, client_fds[i]);  
                         send(client_fds[i], input_msg, BUFFER_SIZE, 0);  
                     }  
@@ -156,7 +180,10 @@ int main(int argc, const char * argv[])
                         if(client_fds[i] == 0)  
                         {  
                             index = i;  
-                            client_fds[i] = client_sock_fd;  
+                            client_fds[i] = client_sock_fd;
+			    devNodes[i].connfd=client_sock_fd;//保存sockfd	  
+
+			      
                             break;  
                         }  
                     }  
@@ -189,7 +216,33 @@ int main(int argc, const char * argv[])
                                 byte_num = BUFFER_SIZE;  
                             }  
                             recv_msg[byte_num] = '\0';  
-			    
+			    //保存设备名称
+			    if(strcmp(subString(recv_msg,0,7),"DEVICE+")==0){
+
+				//排除掉回车符号,根据实际的输入去判断，如果客户端在发送设备信息的时候带有回车就需要在这里把回车符号去掉
+				devNodes[i].name=subString(recv_msg,7,strlen(recv_msg)-1);
+			    } 
+			    //判断客户端是否要与其他客户端通信
+			    if(strcmp(subString(recv_msg,0,7),"MSG_TO+")==0){
+				    for(int j=0;j<CONCURRENT_MAX;j++){
+					    //获取消息主体即 ':'后面的信息
+					    //
+					int end=(int) (strchr(recv_msg,':')-recv_msg);//获得':'的位置，也是设备名的结束位置
+					printf("name of device:%s",devNodes[j].name);
+					if(strcmp(devNodes[j].name,subString(recv_msg,7,end))==0){
+						//匹配到设备
+						char * msg=strchr(recv_msg,':');
+						printf("客户端(%s)要发送给(%s)的消息是%s\n",devNodes[i].name,devNodes[j].name,msg);	
+						
+						send(devNodes[j].connfd,msg,BUFFER_SIZE,0);			
+						
+						break;
+					}
+
+				    }
+			    } 
+
+
                             printf("客户端(%d):%s\n", i, recv_msg);  
                         }  
                         else if(byte_num < 0)  
@@ -200,6 +253,8 @@ int main(int argc, const char * argv[])
                         {  
                             FD_CLR(client_fds[i], &server_fd_set);  
                             client_fds[i] = 0;  
+			    devNodes[i].connfd=0;
+			    devNodes[i].name=NULL;
                             printf("客户端(%d)退出了\n", i);  
                         }  
                     }  
