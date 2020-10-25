@@ -28,8 +28,12 @@ int main(int argc, const char * argv[])
     {  
     fd_set client_fd_set;  
     struct timeval tv;  
-     
-            if(send(server_sock_fd, "DEVICE+123", BUFFER_SIZE, 0) == -1)  
+     char  devName[40]="DEVICE+";
+	    strcat(devName,argv[1]);
+	    devName[strlen(devName)]='\n';
+	    printf("devname:%s",devName);
+	    //相当于 "DEVICE+"+devName+"\n" 
+            if(send(server_sock_fd,devName , BUFFER_SIZE, 0) == -1)  
             {  
                 perror("发送客户端名称消息出错!\n");  
             }  
